@@ -29,6 +29,7 @@ int checkDeath(int posX, int posY, int edgeX, int edgeY, char *status[], char *s
       }
     }
   }
+  //ПЕРЕРАБОТАТЬ УСЛОВИЯ
   if (status[posX][posY] == '@') {
     if (ticker <= 3 && ticker >= 2) {
       status_new[posX][posY] = ' ';
