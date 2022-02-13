@@ -31,8 +31,8 @@ void lifeCycle(char **status, int n, int m, char system);
 int getKey();
 
 int main(void) {
-  int n = 4; // Размеры нашего поля
-  int m = 4;
+  int n = 25; // Размеры нашего поля
+  int m = 80;
   char system = 'L'; // Задаем какая система у нас, иначе БЕДА
   int error = 0; //Ошибки при считывании
   char **status = allocate(n, m);
