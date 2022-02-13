@@ -26,20 +26,21 @@ char ruleOfLife(char status_cell, int neighbours);
 // Переписываем состояние колонии
 void replaceArray(char **array, char **arraytemp, int n, int m);
 // Собственно цикл нашей программы
-void lifeCycle(char **status, int n, int m);
+void lifeCycle(char **status, int n, int m, char system);
 // Считывание клавиши на выход
 int getKey();
 
 int main(void) {
-  int n = 25; // Размеры нашего поля
-  int m = 80;
+  int n = 4; // Размеры нашего поля
+  int m = 4;
+  char system = 'L'; // Задаем какая система у нас, иначе БЕДА
   int error = 0; //Ошибки при считывании
   char **status = allocate(n, m);
   if (status == NULL)
     error = 1;
   error += scanFromStdio(status, n, m);
   if (error == 0) { // Если ошибок не было, запускаемся
-    lifeCycle(status, n, m);
+    lifeCycle(status, n, m, system);
   } else {
     printf("\nThis is an error message, please do not panic!\nOkay, panic!\n");
   }
@@ -135,7 +136,7 @@ void replaceArray(char **array, char **arraytemp, int n, int m) {
   }
 }
 // Наш замечательный жизненный цикл
-void lifeCycle(char **status, int n, int m) {
+void lifeCycle(char **status, int n, int m, char system) {
   int key = 69; // Хе-хе
   long int *hash_array = malloc(2*sizeof(long int));
   if (hash_array == NULL) // Не подмажешь, не поедешь
@@ -144,7 +145,8 @@ void lifeCycle(char **status, int n, int m) {
   drawScreen(status, n, m); // Инициализируем и отрисовываем
   hash_array[hash_len-1] = hashing(status, n, m); // Записываем старое состояние
   refreshLife(status, n, m); // Обновляем колонию
-  freopen("/dev/tty", "rw", stdin); // Перезапускаем нафиг stdin после pipeline (костыль)
+  if (system == 'L')
+    freopen("/dev/tty", "rw", stdin); // Перезапускаем нафиг stdin после pipeline (костыль)
   while (key != 666) {
     if (key == 1) { // Если пробел, работаем.
       drawScreen(status, n, m);
@@ -168,7 +170,8 @@ int getKey() {
   char what_is_love; // baby don't hurt me
   what_is_love = getchar();
   if (what_is_love == EOF) {
-	  printf("!");
+	  printf("Oh my gawd, u use Windows??? Sorry :(\nChange the system to not L");
+    key = 666;
   }
   if (what_is_love == ' ') {
     key = 1;
@@ -178,7 +181,7 @@ int getKey() {
   return key;
 }
 // Считываем таки всё из пайплайна или консоли. Ненавижу считывать чары.
-int scanFromStdio(char **matrix, int n, int m) { 
+int scanFromStdio(char **matrix, int n, int m) {
   int error = 0;
   char c;
   for (int i = 0; i < n; i++) {
