@@ -73,8 +73,8 @@ void drawScreen(char **a, int n, int m) {
 }
 // Проверяем наших соседушек
 int checkNeighbors(char **status, int index_x, int index_y, int n, int m) {
-  int temp_i = 0;
-  int temp_j = 0;
+  int temp_i;
+  int temp_j;
   int count_live = 0;
   for (int i = index_x - 1 ; i <= index_x + 1; i++) {
     for (int j = index_y - 1; j <= index_y + 1; j++) {
@@ -116,7 +116,7 @@ char ruleOfLife(char status_cell, int neighbours) {
 void refreshLife(char **status, int n, int m) {
   char **temp2d = allocate(n, m);
   if (temp2d != NULL) { // Если вдруг фигово аллоцировалось, не пишем туда ничего
-    int neighbours = 0;
+    int neighbours;
     for (int i = 0; i < n; i++) {
       for (int j = 0; j < m; j++) {
         neighbours = checkNeighbors(status, i, j, n, m);
@@ -141,9 +141,10 @@ void lifeCycle(char **status, int n, int m, char system) {
   long int *hash_array = malloc(2*sizeof(long int));
   if (hash_array == NULL) // Не подмажешь, не поедешь
     key = 666;
-  int hash_len = 1;
+  int hash_len = 0;
+  long int *temp;
   drawScreen(status, n, m); // Инициализируем и отрисовываем
-  hash_array[hash_len-1] = hashing(status, n, m); // Записываем старое состояние
+  hash_array[hash_len] = hashing(status, n, m); // Записываем старое состояние
   refreshLife(status, n, m); // Обновляем колонию
   if (system == 'L')
     freopen("/dev/tty", "rw", stdin); // Перезапускаем нафиг stdin после pipeline (костыль)
@@ -152,8 +153,13 @@ void lifeCycle(char **status, int n, int m, char system) {
       drawScreen(status, n, m);
       hash_len++;
       // Больше памяти - богу памяти
+      temp = hash_array;
       hash_array = realloc(hash_array, hash_len * 2 * sizeof(long int));
-      hash_array[hash_len-1] = hashing(status, n, m);
+      if (hash_array == NULL) {
+	      free(temp);
+	      break;
+      }
+      hash_array[hash_len] = hashing(status, n, m);
       // Проверка на конец
       if (checkEnd(status, hash_array, hash_len-1, n, m) == 1)
 	      break;
@@ -169,7 +175,7 @@ int getKey() {
   int key = 69;
   char what_is_love; // baby don't hurt me
   what_is_love = getchar();
-  if (what_is_love == EOF) {
+  if (what_is_love == (int)EOF) {
 	  printf("Oh my gawd, u use Windows??? Sorry :(\nChange the system to not L");
     key = 666;
   }
